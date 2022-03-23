@@ -12,7 +12,7 @@ contract CopernicusBeer is Context, Ownable, ERC721URIStorage  {
 
     Counters.Counter private _tokenIds;
 
-    constructor() ERC721("Copernicus Beer", "CPB") {
+    constructor() ERC721("Copernicus Beer", "CPBEER") {
         //set deployer as the initial owner
     }
 
