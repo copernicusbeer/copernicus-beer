@@ -1,2 +1,2 @@
-# copernicusbeer
-Copernicusbeer
+# copernicus-beer
+Copernicus-beer
