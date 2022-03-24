@@ -31,8 +31,8 @@ contract("CopernicusBeer", accounts => {
   describe("minting", async () => {
     it("creates a new token", async () => {
       const result = await contract.createBeerNFT('URI::::');
-      // const totalSupply = contract.totalSupply();
-      // assert.equal(totalSupply,1);
+      const totalSupply = await contract.totalSupply();
+      assert.equal(totalSupply,1);
       const event = result.logs[0].args;
       assert.equal(event.tokenId.toNumber(), 1, 'id must be 1');
       assert.equal(event.from, '0x0000000000000000000000000000000000000000', 'from is not correct');
@@ -41,6 +41,12 @@ contract("CopernicusBeer", accounts => {
     it("has an URI", async () => {
       const result = await contract.tokenURI(1);
       assert.equal(result.toString(), 'URI::::'); 
+    });
+    it("Set URI of Qrcode", async () => {
+      assert.equal(await contract.qrcodeURI(1), ''); 
+      await contract.setQrcodeURI(1,'HTTP://redirect/');
+      const result = await contract.qrcodeURI(1);
+      assert.equal(result.toString(), 'HTTP://redirect/'); 
     });
   }); 
 

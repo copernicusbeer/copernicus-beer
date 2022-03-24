@@ -13,6 +13,9 @@ contract CopernicusBeer is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable  
 
     Counters.Counter private _tokenIds;
 
+    // Optional mapping for uris of the 24 qrcode's
+    mapping(uint256 => string) private _qrcodeURIs;
+
     constructor() ERC721("Copernicus Beer", "CPBEER") {
         //set deployer as the initial owner
     }
@@ -23,6 +26,18 @@ contract CopernicusBeer is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable  
         _safeMint( _msgSender() , newTokenId);
         _setTokenURI(newTokenId, uri);
         return newTokenId;
+    }
+
+
+    function qrcodeURI(uint256 tokenId) public view returns (string memory) {
+        require(_exists(tokenId), "CopernicusBeer: URI query for nonexistent token");
+        return _qrcodeURIs[tokenId];
+    }
+
+    function setQrcodeURI(uint256 tokenId, string memory _qrcodeURI) public {
+        require(_exists(tokenId), "CopernicusBeer: URI set of nonexistent token");
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "CopernicusBeer: caller is not owner nor approved");
+        _qrcodeURIs[tokenId] = _qrcodeURI;
     }
 
     // The following functions are overrides required by Solidity.
@@ -36,6 +51,9 @@ contract CopernicusBeer is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable  
 
     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
         super._burn(tokenId);
+        if (bytes(_qrcodeURIs[tokenId]).length != 0) {
+            delete _qrcodeURIs[tokenId];
+        }
     }
 
     function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
