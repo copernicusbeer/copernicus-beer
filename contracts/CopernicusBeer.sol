@@ -6,9 +6,10 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
 
-contract CopernicusBeer is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable  {
+contract CopernicusBeer is ERC2981, ERC721, ERC721Enumerable, ERC721URIStorage, Ownable  {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIds;
@@ -18,6 +19,7 @@ contract CopernicusBeer is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable  
 
     constructor() ERC721("Copernicus Beer", "CPBEER") {
         //set deployer as the initial owner
+        //_setDefaultRoyalty(_msgSender(), 1000);
     }
 
     function createBeerNFT(string memory uri) public onlyOwner returns (uint256) {
@@ -51,8 +53,18 @@ contract CopernicusBeer is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable  
 
     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
         super._burn(tokenId);
+        _resetTokenRoyalty(tokenId);
         if (bytes(_qrcodeURIs[tokenId]).length != 0) {
             delete _qrcodeURIs[tokenId];
+        }
+    }
+
+    function _transferOwnership(address newOwner) internal override(Ownable) {
+        super._transferOwnership(newOwner);
+        if (newOwner== address(0)) {
+            _deleteDefaultRoyalty();
+        } else {
+            _setDefaultRoyalty(newOwner, 1000);
         }
     }
 
@@ -63,7 +75,7 @@ contract CopernicusBeer is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable  
      function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, ERC721Enumerable)
+        override(ERC721, ERC721Enumerable, ERC2981)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);

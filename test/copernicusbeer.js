@@ -50,4 +50,21 @@ contract("CopernicusBeer", accounts => {
     });
   }); 
 
+  describe("royalties", async () => {
+    it("royalty fee of 10% of owner contract", async () => {
+      const result = await contract.royaltyInfo(1,100);
+      const owner = await contract.owner();
+
+      assert.equal(result[0],owner);
+      assert.equal(result[1],10);
+    });
+    it("Remove fee if there is no ownership", async () => {
+      const owner = await contract.renounceOwnership();
+      const result = await contract.royaltyInfo(1,100);
+      assert.equal(result[0],'0x0000000000000000000000000000000000000000');
+      assert.equal(result[1],0);
+    });
+  }); 
+
+
 });
